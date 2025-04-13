@@ -2,14 +2,14 @@ param location string = resourceGroup().location
 @secure()
 param Password string
 
-module workspace './modules/workspace.bicep' = {
+module workspace '../modules/workspace.bicep' = {
   name: 'deployWorkspace'
   params: {
     name: 'loganalytics-ws'
     location: location
   }
 }
-module monitor './modules/monitor.bicep' = {
+module monitor '../modules/monitor.bicep' = {
   name: 'enableMonitor'
   params: {
     workspaceId: workspace.outputs.id
@@ -17,7 +17,7 @@ module monitor './modules/monitor.bicep' = {
 }
 
 
-module vnet1 './modules/vnet.bicep' = {
+module vnet1 '../modules/vnet.bicep' = {
   name: 'vnet1Deploy'
   params: {
     name: 'vnet1'
@@ -26,7 +26,7 @@ module vnet1 './modules/vnet.bicep' = {
   }
 }
 
-module vnet2 'modules/vnet.bicep' = {
+module vnet2 '../modules/vnet.bicep' = {
   name: 'vnet2Deploy'
   params: {
     name: 'vnet2'
@@ -35,7 +35,7 @@ module vnet2 'modules/vnet.bicep' = {
   }
 }
 
-module peering 'modules/peering.bicep' = {
+module peering '../modules/peering.bicep' = {
   name: 'vnetPeering'
   params: {
     vnet1: vnet1.outputs.vnet
@@ -43,7 +43,7 @@ module peering 'modules/peering.bicep' = {
   }
 }
 
-module vm1 'modules/vm.bicep' = {
+module vm1 '../modules/vm.bicep' = {
   name: 'vm1Deploy'
   params: {
     name: 'vm1'
@@ -55,7 +55,7 @@ module vm1 'modules/vm.bicep' = {
   }
 }
 
-module vm2 'modules/vm.bicep' = {
+module vm2 '../modules/vm.bicep' = {
   name: 'vm2Deploy'
   params: {
     name: 'vm2'
@@ -66,7 +66,7 @@ module vm2 'modules/vm.bicep' = {
   }
 }
 
-module storage1 'modules/storage.bicep' = {
+module storage1 '../modules/storage.bicep' = {
   name: 'storage1mahmadgill01gmailcom'
   params: {
     name: 'storacc1'
@@ -75,7 +75,7 @@ module storage1 'modules/storage.bicep' = {
   }
 }
 
-module storage2 'modules/storage.bicep' = {
+module storage2 '../modules/storage.bicep' = {
   name: 'storage2mahmadgill01gmailcom'
   params: {
     name: 'storacc2'
