@@ -23,7 +23,7 @@ jobs:
           subscriptionId: ${{ fromJson(secrets.AZURE_CREDENTIALS).subscriptionId }}
           resourceGroupName: 'NEW'
           template: ./bicep/main.bicep
-          parameters: >
-            adminUsername='azureuser'
-            adminPassword='${{ secrets.ADMIN_PASSWORD }}'
-            location='eastus'
+          parameters: |
+            adminUsername=azureuser
+            adminPassword=${{ secrets.ADMIN_PASSWORD }}
+            location=eastus
