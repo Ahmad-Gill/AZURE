@@ -1,24 +1,58 @@
-param vnetName string
+param vnet1Name string
+param vnet2Name string
 param location string
-param addressPrefixes array // e.g., ['10.0.0.0/16'] or ['10.1.0.0/16']
-param subnetPrefix string   // e.g., '10.0.1.0/24' or '10.1.1.0/24'
 
-resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' = {
-  name: vnetName
+resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
+  name: vnet1Name
   location: location
   properties: {
     addressSpace: {
-      addressPrefixes: addressPrefixes
+      addressPrefixes: [
+        '10.0.0.0/16'
+      ]
     }
     subnets: [
       {
         name: 'infra'
         properties: {
-          addressPrefix: subnetPrefix
+          addressPrefix: '10.0.1.0/24'
+        }
+      }
+      {
+        name: 'storage'
+        properties: {
+          addressPrefix: '10.0.2.0/24'
         }
       }
     ]
   }
 }
 
-output vnetId string = vnet.id
+resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' = {
+  name: vnet2Name
+  location: location
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        '10.1.0.0/16'
+      ]
+    }
+    subnets: [
+      {
+        name: 'infra'
+        properties: {
+          addressPrefix: '10.1.1.0/24'
+        }
+      }
+      {
+        name: 'storage'
+        properties: {
+          addressPrefix: '10.1.2.0/24'
+        }
+      }
+    ]
+  }
+}
+
+output vnet1Id string = vnet1.id
+output vnet2Id string = vnet2.id
