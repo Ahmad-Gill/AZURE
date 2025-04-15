@@ -7,9 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy Bicep to Azure
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -27,4 +25,3 @@ jobs:
           template: bicep/main.bicep
           parameters: >
             location=eastus
-            Password=${{ secrets.ADMIN_PASSWORD }}
