@@ -6,9 +6,8 @@ param vm2Name string
 param storageAccount1Name string
 param storageAccount2Name string
 param adminUsername string
-@secure() param adminPassword string
+@secure() param adminPassword securestring
 
-// Deploy Virtual Network
 module vnetModule './modules/vnet.bicep' = {
   name: 'vnetDeployment'
   params: {
@@ -18,7 +17,6 @@ module vnetModule './modules/vnet.bicep' = {
   }
 }
 
-// Deploy Virtual Machines
 module vmModule './modules/vm.bicep' = {
   name: 'vmDeployment'
   params: {
@@ -32,7 +30,6 @@ module vmModule './modules/vm.bicep' = {
   }
 }
 
-// Deploy Storage Accounts
 module storageModule './modules/storage.bicep' = {
   name: 'storageDeployment'
   params: {
@@ -44,7 +41,6 @@ module storageModule './modules/storage.bicep' = {
   }
 }
 
-// Configure Monitoring
 module monitorModule './modules/monitor.bicep' = {
   name: 'monitorDeployment'
   params: {

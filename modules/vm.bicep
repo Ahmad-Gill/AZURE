@@ -3,26 +3,20 @@ param vm2Name string
 param vnet1Id string
 param vnet2Id string
 param location string
-param adminPassword string
 param adminUsername string
+@secure() param adminPassword securestring
 
 resource vm1 'Microsoft.Compute/virtualMachines@2021-03-01' = {
   name: vm1Name
   location: location
   properties: {
     hardwareProfile: {
-      vmSize: 'Standard_B1s'
+      vmSize: 'Standard_DS1_v2'
     }
     storageProfile: {
-      imageReference: {
-        publisher: 'MicrosoftWindowsServer'
-        offer: 'WindowsServer'
-        sku: '2019-Datacenter'
-        version: 'latest'
-      }
       osDisk: {
-        name: 'osdisk1'
         createOption: 'FromImage'
+        name: '${vm1Name}-osDisk'
       }
     }
     osProfile: {
@@ -33,7 +27,7 @@ resource vm1 'Microsoft.Compute/virtualMachines@2021-03-01' = {
     networkProfile: {
       networkInterfaces: [
         {
-          id: '${vnet1Id}/subnets/infra'
+          id: '${vnet1Id}/networkInterfaces/${vm1Name}-nic'
         }
       ]
     }
@@ -45,18 +39,12 @@ resource vm2 'Microsoft.Compute/virtualMachines@2021-03-01' = {
   location: location
   properties: {
     hardwareProfile: {
-      vmSize: 'Standard_B1s'
+      vmSize: 'Standard_DS1_v2'
     }
     storageProfile: {
-      imageReference: {
-        publisher: 'MicrosoftWindowsServer'
-        offer: 'WindowsServer'
-        sku: '2019-Datacenter'
-        version: 'latest'
-      }
       osDisk: {
-        name: 'osdisk2'
         createOption: 'FromImage'
+        name: '${vm2Name}-osDisk'
       }
     }
     osProfile: {
@@ -67,7 +55,7 @@ resource vm2 'Microsoft.Compute/virtualMachines@2021-03-01' = {
     networkProfile: {
       networkInterfaces: [
         {
-          id: '${vnet2Id}/subnets/infra'
+          id: '${vnet2Id}/networkInterfaces/${vm2Name}-nic'
         }
       ]
     }

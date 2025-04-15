@@ -15,7 +15,7 @@ resource storage1 'Microsoft.Storage/storageAccounts@2021-04-01' = {
     networkAcls: {
       virtualNetworkRules: [
         {
-          id: '${vnet1Id}/subnets/storage'  // Ensure the subnet 'storage' exists in vnet1
+          id: '${vnet1Id}/subnets/storage'
         }
       ]
     }
@@ -33,7 +33,7 @@ resource storage2 'Microsoft.Storage/storageAccounts@2021-04-01' = {
     networkAcls: {
       virtualNetworkRules: [
         {
-          id: '${vnet2Id}/subnets/storage'  // Ensure the subnet 'storage' exists in vnet2
+          id: '${vnet2Id}/subnets/storage'
         }
       ]
     }
