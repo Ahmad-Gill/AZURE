@@ -9,13 +9,6 @@ module workspace '../modules/workspace.bicep' = {
     location: location
   }
 }
-module monitor '../modules/monitor.bicep' = {
-  name: 'enableMonitor'
-  params: {
-    workspaceId: workspace.outputs.id
-  }
-}
-
 
 module vnet1 '../modules/vnet.bicep' = {
   name: 'vnet1Deploy'
@@ -23,6 +16,8 @@ module vnet1 '../modules/vnet.bicep' = {
     name: 'vnet1'
     location: location
     addressPrefix: '10.0.0.0/16'
+    infraSubnetPrefix: '10.0.1.0/24'
+    storageSubnetPrefix: '10.0.2.0/24'
   }
 }
 
@@ -32,6 +27,8 @@ module vnet2 '../modules/vnet.bicep' = {
     name: 'vnet2'
     location: location
     addressPrefix: '10.1.0.0/16'
+    infraSubnetPrefix: '10.1.1.0/24'
+    storageSubnetPrefix: '10.1.2.0/24'
   }
 }
 
@@ -49,9 +46,8 @@ module vm1 '../modules/vm.bicep' = {
     name: 'vm1'
     location: location
     subnetId: vnet1.outputs.infraSubnetId
-    user:'azureuser'
-    pas_:Password
-
+    user: 'azureuser'
+    pas_: Password
   }
 }
 
@@ -61,15 +57,15 @@ module vm2 '../modules/vm.bicep' = {
     name: 'vm2'
     location: location
     subnetId: vnet2.outputs.infraSubnetId
-    user:'azureuser'
-    pas_:Password
+    user: 'azureuser'
+    pas_: Password
   }
 }
 
 module storage1 '../modules/storage.bicep' = {
   name: 'storage1mahmadgill01gmailcom'
   params: {
-    name: 'storacc1'
+    name: 'storacc1unique123' // Ensure this name is globally unique
     location: location
     subnetId: vnet1.outputs.storageSubnetId
   }
@@ -78,22 +74,8 @@ module storage1 '../modules/storage.bicep' = {
 module storage2 '../modules/storage.bicep' = {
   name: 'storage2mahmadgill01gmailcom'
   params: {
-    name: 'storacc2'
+    name: 'storacc2unique123' // Ensure this name is globally unique
     location: location
     subnetId: vnet2.outputs.storageSubnetId
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

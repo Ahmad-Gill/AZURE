@@ -1,7 +1,8 @@
-//  their values are passed from the main Bicep file when  deploy the module.
 param name string
 param location string
 param addressPrefix string
+param infraSubnetPrefix string
+param storageSubnetPrefix string
 
 resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' = {
   name: name
@@ -9,20 +10,20 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' = {
   properties: {
     addressSpace: {
       addressPrefixes: [
-        addressPrefix          // set the overall range of the addresses
+        addressPrefix
       ]
     }
     subnets: [
       {
         name: 'infra'
         properties: {
-          addressPrefix: '10.0.1.0/24'
+          addressPrefix: infraSubnetPrefix
         }
       }
       {
         name: 'storage'
         properties: {
-          addressPrefix: '10.0.2.0/24'
+          addressPrefix: storageSubnetPrefix
         }
       }
     ]

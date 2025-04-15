@@ -7,13 +7,13 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   location: location
   kind: 'StorageV2'
   sku: {
-    name: 'Standard_ZRS' // ZRS is the requirement
+    name: 'Standard_ZRS'
   }
   properties: {
     networkAcls: {
       virtualNetworkRules: [
         {
-          id: subnetId       //This means that traffic from the specified virtual network is allowed.
+          id: subnetId
           action: 'Allow'
         }
       ]
