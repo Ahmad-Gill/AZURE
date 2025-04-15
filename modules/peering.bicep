@@ -1,23 +1,14 @@
-param vnet1Name string
-param vnet1ResourceGroup string
-param vnet2Id string
-param peeringName string
+param location string
+param password string
 
-resource vnet1 'Microsoft.Network/virtualNetworks@2021-05-01' existing = {
-  name: vnet1Name
-  scope: resourceGroup(vnet1ResourceGroup)
-}
-
-resource vnetPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2021-05-01' = {
-  name: '${vnet1.name}/${peeringName}'
-  parent: vnet1
+// Example resource definition in a module
+resource peeringResource 'Microsoft.Network/virtualNetworks/peerings@2021-03-01' = {
+  name: 'vnetPeering1'  // Ensure valid naming without '/'
   properties: {
     remoteVirtualNetwork: {
-      id: vnet2Id
+      id: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Network/virtualNetworks/{remoteVnet}'
     }
     allowVirtualNetworkAccess: true
-    allowForwardedTraffic: true
-    allowGatewayTransit: false
-    useRemoteGateways: false
+    allowForwardedTraffic: false
   }
 }
