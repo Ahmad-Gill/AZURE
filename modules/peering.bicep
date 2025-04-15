@@ -7,14 +7,17 @@ param parentVnetName string
 param remoteVnetId string
 param peeringName string
 
-// (Optional) Declare the parent virtual network as an existing resource.
-// This declaration is optional if you don't need to reference properties of the parent.
+// Declare the parent virtual network as an existing resource.
+// Explicitly set the scope to the current resource group so that
+// Bicep looks for the VNet in the correct place.
 resource parentVnet 'Microsoft.Network/virtualNetworks@2021-03-01' existing = {
+  scope: resourceGroup()
   name: parentVnetName
 }
 
-// Create the virtual network peering. When you use the 'parent' property,
-// the resource name should be just the child name without any slashes.
+// Create the virtual network peering using the provided peeringName.
+// Note: When using the 'parent' property, the name of the child resource
+// should be just the unique child identifier without any slashes.
 resource vnetPeering 'Microsoft.Network/virtualNetworks/peerings@2021-05-01' = {
   name: peeringName
   parent: parentVnet
