@@ -1,61 +1,52 @@
+// bicep/main.bicep
+
 param location string = 'East US'
 param adminUsername string
 @secure()
 param adminPassword string
 
-// Deploy VNet 1
+// Deploy VNet 1 using the vnet module
 module vnet1 '../modules/vnet.bicep' = {
   name: 'vnet1Deploy'
   params: {
     vnetName: 'vnet1'
     location: location
-    addressPrefixes: ['10.1.0.0/16']
-    subnetPrefix: '10.1.0.0/24'
+    addressPrefixes: ['10.0.0.0/16']
+    subnetPrefix: '10.0.1.0/24'
   }
 }
 
-// Deploy VNet 2
+// Deploy VNet 2 using the vnet module
 module vnet2 '../modules/vnet.bicep' = {
   name: 'vnet2Deploy'
   params: {
     vnetName: 'vnet2'
     location: location
-    addressPrefixes: ['10.2.0.0/16']
-    subnetPrefix: '10.2.0.0/24'
+    addressPrefixes: ['10.1.0.0/16']
+    subnetPrefix: '10.1.1.0/24'
   }
 }
 
-// VNet Peering: vnet1 → vnet2
-module peerVnet1toVnet2 '../modules/peering.bicep' = {
-  name: 'peerVnet1toVnet2'
-  params: {
-    parentVnetName: 'vnet1'
-    remoteVnetId: vnet2.outputs.vnetId
-    peeringName: 'vnet1-to-vnet2'
-  }
+// Create bidirectional VNet Peering between vnet1 and vnet2
+// This module creates two peerings—one from vnet1 to vnet2, and another from vnet2 to vnet1.
+module peering '../modules/peering.bicep' = {
+  name: 'vnetPeering'
   dependsOn: [
     vnet1
     vnet2
   ]
-}
-
-// VNet Peering: vnet2 → vnet1
-module peerVnet2toVnet1 '../modules/peering.bicep' = {
-  name: 'peerVnet2toVnet1'
   params: {
-    parentVnetName: 'vnet2'
-    remoteVnetId: vnet1.outputs.vnetId
-    peeringName: 'vnet2-to-vnet1'
+    vnet1Id: vnet1.outputs.vnetId
+    vnet2Id: vnet2.outputs.vnetId
   }
-  dependsOn: [
-    vnet1
-    vnet2
-  ]
 }
 
-// Deploy VM in VNet 1
+// Deploy VM in VNet 1 using the vm module
 module vm1 '../modules/vm.bicep' = {
   name: 'vm1Deploy'
+  dependsOn: [
+    vnet1
+  ]
   params: {
     vmName: 'vm1'
     location: location
@@ -63,14 +54,14 @@ module vm1 '../modules/vm.bicep' = {
     adminUsername: adminUsername
     adminPassword: adminPassword
   }
-  dependsOn: [
-    vnet1
-  ]
 }
 
-// Deploy VM in VNet 2
+// Deploy VM in VNet 2 using the vm module
 module vm2 '../modules/vm.bicep' = {
   name: 'vm2Deploy'
+  dependsOn: [
+    vnet2
+  ]
   params: {
     vmName: 'vm2'
     location: location
@@ -78,12 +69,9 @@ module vm2 '../modules/vm.bicep' = {
     adminUsername: adminUsername
     adminPassword: adminPassword
   }
-  dependsOn: [
-    vnet2
-  ]
 }
 
-// Storage Account 1
+// Deploy Storage Account 1 using the storage module
 module storage1 '../modules/storage.bicep' = {
   name: 'storage1Deploy'
   params: {
@@ -92,7 +80,7 @@ module storage1 '../modules/storage.bicep' = {
   }
 }
 
-// Storage Account 2
+// Deploy Storage Account 2 using the storage module
 module storage2 '../modules/storage.bicep' = {
   name: 'storage2Deploy'
   params: {

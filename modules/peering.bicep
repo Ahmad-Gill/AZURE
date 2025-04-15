@@ -1,20 +1,27 @@
+// modules/peering.bicep
+// This module creates bidirectional VNet peering between two existing VNets.
+
 param vnet1Id string
 param vnet2Id string
 
-// Use the resourceId to declare existing VNets based on full ID
+// Extract the VNet names from their IDs.
+var vnet1Name = last(split(vnet1Id, '/'))
+var vnet2Name = last(split(vnet2Id, '/'))
+
+// Declare the existing VNets using the current resource group scope.
 resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' existing = {
   scope: resourceGroup()
-  name: last(split(vnet1Id, '/'))
+  name: vnet1Name
 }
 
 resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' existing = {
   scope: resourceGroup()
-  name: last(split(vnet2Id, '/'))
+  name: vnet2Name
 }
 
-// VNet1 → VNet2 Peering
+// Create peering from vnet1 to vnet2.
 resource peering1 'Microsoft.Network/virtualNetworks/peerings@2021-08-01' = {
-  name: 'peering-vnet1-to-vnet2'
+  name: 'peer-${vnet1Name}-to-${vnet2Name}'
   parent: vnet1
   properties: {
     remoteVirtualNetwork: {
@@ -27,9 +34,9 @@ resource peering1 'Microsoft.Network/virtualNetworks/peerings@2021-08-01' = {
   }
 }
 
-// VNet2 → VNet1 Peering
+// Create peering from vnet2 to vnet1.
 resource peering2 'Microsoft.Network/virtualNetworks/peerings@2021-08-01' = {
-  name: 'peering-vnet2-to-vnet1'
+  name: 'peer-${vnet2Name}-to-${vnet1Name}'
   parent: vnet2
   properties: {
     remoteVirtualNetwork: {
