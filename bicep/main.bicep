@@ -1,23 +1,25 @@
-param location string
-param Password string
+@secure() param Password string // Mark Password as secure
 
-// Define the resource group
+// Define the location as 'East US' explicitly
+var location = 'East US'
+
+// Define the resource group with the name 'NEW' and location set to 'East US'
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'myResourceGroup'
+  name: 'NEW'
   location: location
 }
 
-// Include submodule for peering
-module peering 'modules/peering.bicep' = {
+// Use the relative path to the peering module
+module peering '../modules/peering.bicep' = {
   name: 'peeringDeployment'
-  scope: rg // Ensure scope is explicitly defined
+  scope: subscription() // Set the scope to subscription
   params: {
     location: location
     password: Password
   }
 }
 
-// Example of defining a resource with proper naming convention
+// Example of defining a virtual network resource
 resource vnet 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: 'vnet1'
   location: location
@@ -28,7 +30,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   }
 }
 
-// Ensure all resources have names without '/'
+// Define a subnet within the virtual network
 resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-03-01' = {
   parent: vnet
   name: 'subnet1'
