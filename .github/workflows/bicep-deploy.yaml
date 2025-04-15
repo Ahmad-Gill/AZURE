@@ -23,8 +23,8 @@ jobs:
         uses: azure/arm-deploy@v1
         with:
           subscriptionId: ${{ fromJson(secrets.AZURE_CREDENTIALS).subscriptionId }}
-          resourceGroupName: 'NEW'
+          resourceGroupName: 'NEW'  # Ensure the resource group 'NEW' exists or modify as needed
           template: bicep/main.bicep
-          parameters: >
+          parameters: |
             location=eastus
-            Password=${{ secrets.ADMIN_PASSWORD }}
+            Password=${{ secrets.ADMIN_PASSWORD }}  # Make sure this parameter is properly defined in the Bicep template

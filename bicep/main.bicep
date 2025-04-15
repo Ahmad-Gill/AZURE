@@ -1,15 +1,12 @@
 // main.bicep
 
-// Define resource group to deploy to
-resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'myResourceGroup'
-  location: 'East US' // Directly specify the location here
-}
+// Use a parameter for location because resourceGroup().location is not evaluable at compile time.
+param location string
 
-// Define virtual network 1
+// Virtual Network 1: Create a VNet named 'vnet1' in the specified location.
 resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: 'vnet1'
-  location: rg.location // Assign location directly from the resource group
+  location: location
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -19,10 +16,10 @@ resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   }
 }
 
-// Define virtual network 2
+// Virtual Network 2: Create a VNet named 'vnet2' in the specified location.
 resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: 'vnet2'
-  location: rg.location // Assign location directly from the resource group
+  location: location
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -32,29 +29,31 @@ resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   }
 }
 
-// Import peering module for creating peering between VNet 1 and VNet 2
+// Module call: Peering from vnet1 to vnet2.
+// The module file is located at ../modules/peering.bicep relative to this main file.
 module peering1 '../modules/peering.bicep' = {
   name: 'vnet1ToVnet2Peering'
   params: {
     vnet1Name: vnet1.name
-    vnet1ResourceGroup: rg.name
+    // Although we cannot use rg.location, resourceGroup().name is allowed.
+    vnet1ResourceGroup: resourceGroup().name
     vnet2Id: vnet2.id
     peeringName: 'vnet1ToVnet2'
   }
 }
 
-// Import peering module for creating peering between VNet 2 and VNet 1
+// Module call: Peering from vnet2 to vnet1 (for bidirectional connectivity).
 module peering2 '../modules/peering.bicep' = {
   name: 'vnet2ToVnet1Peering'
   params: {
+    // When called from here, vnet1Name represents the VNet whose peering is being defined.
     vnet1Name: vnet2.name
-    vnet1ResourceGroup: rg.name
+    vnet1ResourceGroup: resourceGroup().name
     vnet2Id: vnet1.id
     peeringName: 'vnet2ToVnet1'
   }
 }
 
-// Output for the virtual networks and peering
 output vnet1Name string = vnet1.name
 output vnet2Name string = vnet2.name
 output peering1Name string = peering1.name
