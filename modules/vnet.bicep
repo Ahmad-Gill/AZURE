@@ -19,3 +19,5 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' = {
     ]
   }
 }
+
+output vnetId string = vnet.id

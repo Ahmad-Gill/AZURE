@@ -3,6 +3,7 @@ param adminUsername string
 @secure()
 param adminPassword string
 
+// Deploying Virtual Network 1
 module vnet1 '../modules/vnet.bicep' = {
   name: 'vnet1Module'
   params: {
@@ -12,6 +13,7 @@ module vnet1 '../modules/vnet.bicep' = {
   }
 }
 
+// Deploying Virtual Network 2
 module vnet2 '../modules/vnet.bicep' = {
   name: 'vnet2Module'
   params: {
@@ -21,7 +23,7 @@ module vnet2 '../modules/vnet.bicep' = {
   }
 }
 
-
+// Setting up VNet Peering between vnet1 and vnet2
 module peering '../modules/peering.bicep' = {
   name: 'vnetPeering'
   params: {
@@ -31,6 +33,7 @@ module peering '../modules/peering.bicep' = {
   }
 }
 
+// Deploying Virtual Machine 1 in VNet 1
 module vm1 '../modules/vm.bicep' = {
   name: 'vm1Deploy'
   params: {
@@ -42,6 +45,7 @@ module vm1 '../modules/vm.bicep' = {
   }
 }
 
+// Deploying Virtual Machine 2 in VNet 2
 module vm2 '../modules/vm.bicep' = {
   name: 'vm2Deploy'
   params: {
@@ -53,6 +57,7 @@ module vm2 '../modules/vm.bicep' = {
   }
 }
 
+// Deploying Storage Account 1
 module storage1 '../modules/storage.bicep' = {
   name: 'storage1Deploy'
   params: {
@@ -61,6 +66,7 @@ module storage1 '../modules/storage.bicep' = {
   }
 }
 
+// Deploying Storage Account 2
 module storage2 '../modules/storage.bicep' = {
   name: 'storage2Deploy'
   params: {
@@ -68,4 +74,3 @@ module storage2 '../modules/storage.bicep' = {
     location: location
   }
 }
-
