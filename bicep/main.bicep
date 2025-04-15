@@ -8,6 +8,7 @@ module vnet1 '../modules/vnet.bicep' = {
   params: {
     vnetName: 'vnet1'
     location: location
+    addressPrefixes: ['10.0.0.0/16']
   }
 }
 
@@ -16,8 +17,10 @@ module vnet2 '../modules/vnet.bicep' = {
   params: {
     vnetName: 'vnet2'
     location: location
+    addressPrefixes: ['10.1.0.0/16']
   }
 }
+
 
 module peering '../modules/peering.bicep' = {
   name: 'vnetPeering'
