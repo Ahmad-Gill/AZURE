@@ -3,35 +3,37 @@ param adminUsername string
 @secure()
 param adminPassword string
 
-// Deploying Virtual Network 1
 module vnet1 '../modules/vnet.bicep' = {
   name: 'vnet1Module'
   params: {
     vnetName: 'vnet1'
     location: location
     addressPrefixes: ['10.0.0.0/16']
+    subnetPrefix: '10.0.0.0/24'
   }
 }
 
-// Deploying Virtual Network 2
 module vnet2 '../modules/vnet.bicep' = {
   name: 'vnet2Module'
   params: {
     vnetName: 'vnet2'
     location: location
     addressPrefixes: ['10.1.0.0/16']
+    subnetPrefix: '10.1.0.0/24'
   }
 }
 
-// Setting up VNet Peering between vnet1 and vnet2
+
 module peering '../modules/peering.bicep' = {
-  name: 'vnetPeering'
+  name: 'vnetPeeringBothWays'
   params: {
-    parentVnetName: 'vnet1'
-    remoteVnetId: vnet2.outputs.vnetId  // Referencing vnet2's output for its vnetId
-    peeringName: 'vnet1-to-vnet2'
+    vnet1Name: 'vnet1'
+    vnet2Name: 'vnet2'
+    vnet1Id: vnet1.outputs.vnetId
+    vnet2Id: vnet2.outputs.vnetId
   }
 }
+
 
 // Deploying Virtual Machine 1 in VNet 1
 module vm1 '../modules/vm.bicep' = {
