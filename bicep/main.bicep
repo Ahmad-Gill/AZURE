@@ -16,7 +16,7 @@ resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   }
 }
 
-// Create Virtual Network 2 with address space 10.1.0.0/16
+// Create a Virtual Network 2 with address space 10.1.0.0/16
 resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: 'vnet2'
   location: location  // Use the location parameter
