@@ -1,27 +1,29 @@
 param vnet1Name string
 param vnet2Name string
-param location string
+param addressPrefix string
+param infraSubnetPrefix string
+param storageSubnetPrefix string
 
 resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: vnet1Name
-  location: location
+  location: resourceGroup().location
   properties: {
     addressSpace: {
       addressPrefixes: [
-        '10.0.0.0/16'
+        addressPrefix
       ]
     }
     subnets: [
       {
-        name: 'infra'
+        name: 'infraSubnet'
         properties: {
-          addressPrefix: '10.0.1.0/24'
+          addressPrefix: infraSubnetPrefix
         }
       }
       {
-        name: 'storage'
+        name: 'storageSubnet'
         properties: {
-          addressPrefix: '10.0.2.0/24'
+          addressPrefix: storageSubnetPrefix
         }
       }
     ]
@@ -30,29 +32,26 @@ resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
 
 resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: vnet2Name
-  location: location
+  location: resourceGroup().location
   properties: {
     addressSpace: {
       addressPrefixes: [
-        '10.1.0.0/16'
+        addressPrefix
       ]
     }
     subnets: [
       {
-        name: 'infra'
+        name: 'infraSubnet'
         properties: {
-          addressPrefix: '10.1.1.0/24'
+          addressPrefix: infraSubnetPrefix
         }
       }
       {
-        name: 'storage'
+        name: 'storageSubnet'
         properties: {
-          addressPrefix: '10.1.2.0/24'
+          addressPrefix: storageSubnetPrefix
         }
       }
     ]
   }
 }
-
-output vnet1Id string = vnet1.id
-output vnet2Id string = vnet2.id
