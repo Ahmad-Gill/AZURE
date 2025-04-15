@@ -1,12 +1,12 @@
 // bicep/main.bicep
 
-// Set a fixed location
-var location = 'East US'
+// Define a location parameter
+param location string = 'East US'  // Default value if not passed
 
 // Create Virtual Network 1 with address space 10.0.0.0/16
 resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: 'vnet1'
-  location: location
+  location: location  // Use the location parameter
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -19,7 +19,7 @@ resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
 // Create Virtual Network 2 with address space 10.1.0.0/16
 resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: 'vnet2'
-  location: location
+  location: location  // Use the location parameter
   properties: {
     addressSpace: {
       addressPrefixes: [
