@@ -27,4 +27,3 @@ jobs:
             adminUsername=azureuser
             adminPassword=${{ secrets.ADMIN_PASSWORD }}
             location=eastus
-
