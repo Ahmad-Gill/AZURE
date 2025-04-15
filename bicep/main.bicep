@@ -1,13 +1,9 @@
 // bicep/main.bicep
-// Static definitions for location and resource group
 
+// Set a fixed location
 var location = 'East US'
 
-// The resource group name is NEW.
-// (This deployment is assumed to run in an existing resource group "NEW", 
-// provided via your ARM deployment configuration.)
-//
-// Create VNet1
+// Create Virtual Network 1 with address space 10.0.0.0/16
 resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: 'vnet1'
   location: location
@@ -20,7 +16,7 @@ resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   }
 }
 
-// Create VNet2
+// Create Virtual Network 2 with address space 10.1.0.0/16
 resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: 'vnet2'
   location: location
@@ -33,11 +29,11 @@ resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   }
 }
 
-// Deploy VNet Peering from vnet1 to vnet2.
-// This module will create a peering resource under vnet1.
+// Deploy VNet peering from vnet1 to vnet2 using the peering module.
+// The module is located at ../modules/peering.bicep relative to this file.
 module peering1 '../modules/peering.bicep' = {
   name: 'peeringFromVnet1'
-  scope: resourceGroup() // Deploy into the current resource group ("NEW")
+  scope: resourceGroup() // Deploy into the current resource group (NEW)
   params: {
     parentVnetName: vnet1.name
     remoteVnetId: vnet2.id
@@ -45,7 +41,7 @@ module peering1 '../modules/peering.bicep' = {
   }
 }
 
-// (Optional) Deploy VNet Peering from vnet2 to vnet1 for bidirectional connectivity.
+// Deploy VNet peering from vnet2 to vnet1 (for bidirectional connectivity)
 module peering2 '../modules/peering.bicep' = {
   name: 'peeringFromVnet2'
   scope: resourceGroup()
