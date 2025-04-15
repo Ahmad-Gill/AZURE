@@ -53,7 +53,7 @@ module vm2 '../modules/vm.bicep' = {
 module storage1 '../modules/storage.bicep' = {
   name: 'storage1Deploy'
   params: {
-    storageAccountName: 'storageacct1${uniqueString(resourceGroup().id)}'
+    storageAccountName: 'stg1${uniqueString(resourceGroup().id)}'
     location: location
   }
 }
@@ -61,7 +61,8 @@ module storage1 '../modules/storage.bicep' = {
 module storage2 '../modules/storage.bicep' = {
   name: 'storage2Deploy'
   params: {
-    storageAccountName: 'storageacct2${uniqueString(resourceGroup().id)}'
+    storageAccountName: 'stg2${uniqueString(resourceGroup().id)}'
     location: location
   }
 }
+
