@@ -1,12 +1,12 @@
-param name string
+param vmName string
 param location string
 param subnetId string
-param user string
+param adminUsername string
 @secure()
-param pas_ string
+param adminPassword string
 
-resource nic 'Microsoft.Network/networkInterfaces@2021-05-01' = {
-  name: '${name}-nic'
+resource nic 'Microsoft.Network/networkInterfaces@2021-08-01' = {
+  name: '${vmName}-nic'
   location: location
   properties: {
     ipConfigurations: [
@@ -23,28 +23,28 @@ resource nic 'Microsoft.Network/networkInterfaces@2021-05-01' = {
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2021-11-01' = {
-  name: name
+resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
+  name: vmName
   location: location
   properties: {
     hardwareProfile: {
       vmSize: 'Standard_B1s'
     }
+    osProfile: {
+      computerName: vmName
+      adminUsername: adminUsername
+      adminPassword: adminPassword
+    }
     storageProfile: {
       imageReference: {
         publisher: 'MicrosoftWindowsServer'
         offer: 'WindowsServer'
-        sku: '2022-datacenter-smalldisk'
+        sku: '2019-Datacenter'
         version: 'latest'
       }
       osDisk: {
         createOption: 'FromImage'
       }
-    }
-    osProfile: {
-      computerName: name
-      adminUsername: user
-      adminPassword: pas_
     }
     networkProfile: {
       networkInterfaces: [

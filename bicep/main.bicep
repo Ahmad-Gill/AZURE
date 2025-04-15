@@ -1,56 +1,67 @@
-// bicep/main.bicep
+param location string = 'East US'
+param adminUsername string
+@secure()
+param adminPassword string
 
-// Define a location parameter
-param location string = 'East US'  // Default value if not passed
-
-// Create Virtual Network 1 with address space 10.0.0.0/16
-resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
-  name: 'vnet1'
-  location: location  // Use the location parameter
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        '10.0.0.0/16'
-      ]
-    }
-  }
-}
-
-// Create a Virtual Network 2 with address space 10.1.0.0/16
-resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' = {
-  name: 'vnet2'
-  location: location  // Use the location parameter
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        '10.1.0.0/16'
-      ]
-    }
-  }
-}
-
-// Deploy VNet peering from vnet1 to vnet2 using the peering module.
-// The module is located at ../modules/peering.bicep relative to this file.
-module peering1 '../modules/peering.bicep' = {
-  name: 'peeringFromVnet1'
-  scope: resourceGroup() // Deploy into the current resource group (NEW)
+module vnet1 '../modules/vnet.bicep' = {
+  name: 'vnet1Module'
   params: {
-    parentVnetName: vnet1.name
-    remoteVnetId: vnet2.id
-    peeringName: 'vnet1ToVnet2'
+    vnetName: 'vnet1'
+    location: location
   }
 }
 
-// Deploy VNet peering from vnet2 to vnet1 (for bidirectional connectivity)
-module peering2 '../modules/peering.bicep' = {
-  name: 'peeringFromVnet2'
-  scope: resourceGroup()
+module vnet2 '../modules/vnet.bicep' = {
+  name: 'vnet2Module'
   params: {
-    parentVnetName: vnet2.name
-    remoteVnetId: vnet1.id
-    peeringName: 'vnet2ToVnet1'
+    vnetName: 'vnet2'
+    location: location
   }
 }
 
-output vnet1Id string = vnet1.id
-output vnet2Id string = vnet2.id
+module peering '../modules/peering.bicep' = {
+  name: 'vnetPeering'
+  params: {
+    parentVnetName: 'vnet1'
+    remoteVnetId: vnet2.outputs.vnetId
+    peeringName: 'vnet1-to-vnet2'
+  }
+}
+
+module vm1 '../modules/vm.bicep' = {
+  name: 'vm1Deploy'
+  params: {
+    vmName: 'vm1'
+    location: location
+    subnetId: '${vnet1.outputs.vnetId}/subnets/infra'
+    adminUsername: adminUsername
+    adminPassword: adminPassword
+  }
+}
+
+module vm2 '../modules/vm.bicep' = {
+  name: 'vm2Deploy'
+  params: {
+    vmName: 'vm2'
+    location: location
+    subnetId: '${vnet2.outputs.vnetId}/subnets/infra'
+    adminUsername: adminUsername
+    adminPassword: adminPassword
+  }
+}
+
+module storage1 '../modules/storage.bicep' = {
+  name: 'storage1Deploy'
+  params: {
+    storageAccountName: 'storageacct1${uniqueString(resourceGroup().id)}'
+    location: location
+  }
+}
+
+module storage2 '../modules/storage.bicep' = {
+  name: 'storage2Deploy'
+  params: {
+    storageAccountName: 'storageacct2${uniqueString(resourceGroup().id)}'
+    location: location
+  }
+}

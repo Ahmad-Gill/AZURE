@@ -1,23 +1,14 @@
-param name string
+param storageAccountName string
 param location string
-param subnetId string
 
 resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: name
+  name: storageAccountName
   location: location
-  kind: 'StorageV2'
   sku: {
     name: 'Standard_ZRS'
   }
+  kind: 'StorageV2'
   properties: {
-    networkAcls: {
-      virtualNetworkRules: [
-        {
-          id: subnetId
-          action: 'Allow'
-        }
-      ]
-      defaultAction: 'Deny'
-    }
+    accessTier: 'Hot'
   }
 }

@@ -1,35 +1,30 @@
-param name string
+param vnetName string
 param location string
-param addressPrefix string
-param infraSubnetPrefix string
-param storageSubnetPrefix string
 
-resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' = {
-  name: name
+resource vnet 'Microsoft.Network/virtualNetworks@2021-03-01' = {
+  name: vnetName
   location: location
   properties: {
     addressSpace: {
       addressPrefixes: [
-        addressPrefix
+        '10.0.0.0/16'
       ]
     }
     subnets: [
       {
         name: 'infra'
         properties: {
-          addressPrefix: infraSubnetPrefix
+          addressPrefix: '10.0.1.0/24'
         }
       }
       {
         name: 'storage'
         properties: {
-          addressPrefix: storageSubnetPrefix
+          addressPrefix: '10.0.2.0/24'
         }
       }
     ]
   }
 }
 
-output vnet object = vnet
-output infraSubnetId string = vnet.properties.subnets[0].id
-output storageSubnetId string = vnet.properties.subnets[1].id
+output vnetId string = vnet.id
