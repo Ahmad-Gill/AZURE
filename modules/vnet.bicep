@@ -1,11 +1,11 @@
-param vnet1Name string
-param vnet2Name string
+// modules/vnet.bicep
+param vnetName string
 param addressPrefix string
 param infraSubnetPrefix string
 param storageSubnetPrefix string
 
-resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
-  name: vnet1Name
+resource vnet 'Microsoft.Network/virtualNetworks@2021-03-01' = {
+  name: vnetName
   location: resourceGroup().location
   properties: {
     addressSpace: {
@@ -30,28 +30,5 @@ resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   }
 }
 
-resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' = {
-  name: vnet2Name
-  location: resourceGroup().location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        addressPrefix
-      ]
-    }
-    subnets: [
-      {
-        name: 'infraSubnet'
-        properties: {
-          addressPrefix: infraSubnetPrefix
-        }
-      }
-      {
-        name: 'storageSubnet'
-        properties: {
-          addressPrefix: storageSubnetPrefix
-        }
-      }
-    ]
-  }
-}
+output infraSubnetId string = vnet.properties.subnets[0].id
+output storageSubnetId string = vnet.properties.subnets[1].id

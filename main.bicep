@@ -28,7 +28,6 @@ module vnet1Module 'modules/vnet.bicep' = {
   name: 'vnet1Deploy'
   params: {
     vnetName: vnet1Name
-    location: location
     addressPrefix: vnet1AddressPrefix
     infraSubnetPrefix: vnet1InfraPrefix
     storageSubnetPrefix: vnet1StoragePrefix
@@ -40,7 +39,6 @@ module vnet2Module 'modules/vnet.bicep' = {
   name: 'vnet2Deploy'
   params: {
     vnetName: vnet2Name
-    location: location
     addressPrefix: vnet2AddressPrefix
     infraSubnetPrefix: vnet2InfraPrefix
     storageSubnetPrefix: vnet2StoragePrefix
@@ -57,9 +55,10 @@ module peerModule 'modules/peerVnets.bicep' = {
   }
 }
 
-// Deploy VM in each VNet
+// Deploy VM in VNet 1
 module vm1Module 'modules/vm.bicep' = {
   name: 'vm1Deploy'
+  dependsOn: [ vnet1Module ]
   params: {
     vmName: vm1Name
     location: location
@@ -69,8 +68,10 @@ module vm1Module 'modules/vm.bicep' = {
   }
 }
 
+// Deploy VM in VNet 2
 module vm2Module 'modules/vm.bicep' = {
   name: 'vm2Deploy'
+  dependsOn: [ vnet2Module ]
   params: {
     vmName: vm2Name
     location: location
@@ -80,9 +81,10 @@ module vm2Module 'modules/vm.bicep' = {
   }
 }
 
-// Deploy Storage Accounts in each VNet
+// Deploy Storage Account 1
 module storage1Module 'modules/storage.bicep' = {
   name: 'storage1Deploy'
+  dependsOn: [ vnet1Module ]
   params: {
     storageAccountName: storage1Name
     location: location
@@ -91,8 +93,10 @@ module storage1Module 'modules/storage.bicep' = {
   }
 }
 
+// Deploy Storage Account 2
 module storage2Module 'modules/storage.bicep' = {
   name: 'storage2Deploy'
+  dependsOn: [ vnet2Module ]
   params: {
     storageAccountName: storage2Name
     location: location
