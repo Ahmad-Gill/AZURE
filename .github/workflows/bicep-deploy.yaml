@@ -8,6 +8,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,5 +27,5 @@ jobs:
           template: ./bicep/main.bicep
           parameters: |
             adminUsername=azureuser
-            adminPassword=${{ secrets.ADMIN_PASSWORD }}
+            adminPassword=${{ env.ADMIN_PASSWORD }}
             location=eastus
