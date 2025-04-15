@@ -28,7 +28,7 @@ module peering '../modules/peering.bicep' = {
   name: 'vnetPeering'
   params: {
     parentVnetName: 'vnet1'
-    remoteVnetId: vnet2.outputs.vnetId
+    remoteVnetId: vnet2.outputs.vnetId  // Referencing vnet2's output for its vnetId
     peeringName: 'vnet1-to-vnet2'
   }
 }
