@@ -16,8 +16,8 @@ param adminUsername string = 'azureuser'
 @secure()
 param adminPassword string
 
-param storage1Name string = 'storastudent1hassan786'
-param storage2Name string = 'storastudent2hassan786'
+param storage1Name string = 'storastudent1ahmad786'
+param storage2Name string = 'storastudent2ahmad786'
 
 module vnet1Module 'modules/vnet.bicep' = {
   name: 'vnet1Deploy'
