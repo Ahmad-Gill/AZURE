@@ -13,7 +13,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' = {
       {
         name: 'infra'
         properties: {
-          addressPrefix: '10.1.0.0/24'  // Adjusted to be inside the 10.1.0.0/16 range
+          addressPrefix: '10.1.0.0/24' 
         }
       }
     ]
