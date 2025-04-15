@@ -1,50 +1,102 @@
 param location string = resourceGroup().location
-param vnet1Name string
-param vnet2Name string
-param vm1Name string
-param vm2Name string
-param storageAccount1Name string
-param storageAccount2Name string
-param adminUsername string
-@secure() param adminPassword securestring
 
-module vnetModule './modules/vnet.bicep' = {
-  name: 'vnetDeployment'
+// VNet 1 parameters
+param vnet1Name string = 'vnet-example-1'
+param vnet1AddressPrefix string = '10.0.0.0/16'
+param vnet1InfraPrefix string = '10.0.1.0/24'
+param vnet1StoragePrefix string = '10.0.2.0/24'
+
+// VNet 2 parameters
+param vnet2Name string = 'vnet-example-2'
+param vnet2AddressPrefix string = '10.1.0.0/16'
+param vnet2InfraPrefix string = '10.1.1.0/24'
+param vnet2StoragePrefix string = '10.1.2.0/24'
+
+// VM parameters
+param vm1Name string = 'vm-example-1'
+param vm2Name string = 'vm-example-2'
+param adminUsername string = 'azureuser'
+@secure()
+param adminPassword string
+
+// Storage Account parameters
+param storage1Name string = 'storage1example'
+param storage2Name string = 'storage2example'
+
+// Deploy VNet 1
+module vnet1Module 'modules/vnet.bicep' = {
+  name: 'vnet1Deploy'
   params: {
-    vnet1Name: vnet1Name
-    vnet2Name: vnet2Name
+    vnetName: vnet1Name
     location: location
+    addressPrefix: vnet1AddressPrefix
+    infraSubnetPrefix: vnet1InfraPrefix
+    storageSubnetPrefix: vnet1StoragePrefix
   }
 }
 
-module vmModule './modules/vm.bicep' = {
-  name: 'vmDeployment'
+// Deploy VNet 2
+module vnet2Module 'modules/vnet.bicep' = {
+  name: 'vnet2Deploy'
   params: {
-    vm1Name: vm1Name
-    vm2Name: vm2Name
-    vnet1Id: vnetModule.outputs.vnet1Id
-    vnet2Id: vnetModule.outputs.vnet2Id
+    vnetName: vnet2Name
     location: location
+    addressPrefix: vnet2AddressPrefix
+    infraSubnetPrefix: vnet2InfraPrefix
+    storageSubnetPrefix: vnet2StoragePrefix
+  }
+}
+
+// Peer the VNets
+module peerModule 'modules/peerVnets.bicep' = {
+  name: 'peerVnets'
+  dependsOn: [ vnet1Module, vnet2Module ]
+  params: {
+    vnet1Name: vnet1Name
+    vnet2Name: vnet2Name
+  }
+}
+
+// Deploy VM in each VNet
+module vm1Module 'modules/vm.bicep' = {
+  name: 'vm1Deploy'
+  params: {
+    vmName: vm1Name
+    location: location
+    subnetId: vnet1Module.outputs.infraSubnetId
     adminUsername: adminUsername
     adminPassword: adminPassword
   }
 }
 
-module storageModule './modules/storage.bicep' = {
-  name: 'storageDeployment'
+module vm2Module 'modules/vm.bicep' = {
+  name: 'vm2Deploy'
   params: {
-    storageAccount1Name: storageAccount1Name
-    storageAccount2Name: storageAccount2Name
-    vnet1Id: vnetModule.outputs.vnet1Id
-    vnet2Id: vnetModule.outputs.vnet2Id
+    vmName: vm2Name
     location: location
+    subnetId: vnet2Module.outputs.infraSubnetId
+    adminUsername: adminUsername
+    adminPassword: adminPassword
   }
 }
 
-module monitorModule './modules/monitor.bicep' = {
-  name: 'monitorDeployment'
+// Deploy Storage Accounts in each VNet
+module storage1Module 'modules/storage.bicep' = {
+  name: 'storage1Deploy'
   params: {
+    storageAccountName: storage1Name
     location: location
-    storageAccount1Id: storageModule.outputs.storageAccount1Id
+    storageAccountSku: 'Standard_ZRS'
+    storageSubnetId: vnet1Module.outputs.storageSubnetId
+  }
+}
+
+module storage2Module 'modules/storage.bicep' = {
+  name: 'storage2Deploy'
+  params: {
+    storageAccountName: storage2Name
+    location: location
+    storageAccountSku: 'Standard_ZRS'
+    storageSubnetId: vnet2Module.outputs.storageSubnetId
   }
 }

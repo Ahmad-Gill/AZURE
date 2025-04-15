@@ -1,14 +1,31 @@
-param location string
-param storageAccount1Id string
+param resourceId string
+param logAnalyticsWorkspaceId string
+param diagnosticName string = 'diag-${uniqueString(resourceId)}'
 
-resource monitor 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: 'monitorSetting'
+resource diag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: diagnosticName
+  scope: resourceId
   properties: {
-    logs: []
-    metrics: []
-    storageAccountId: storageAccount1Id
-    eventHubAuthorizationRuleId: ''
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      {
+        category: 'AuditLogs'
+        enabled: true
+        retentionPolicy: {
+          enabled: false
+          days: 0
+        }
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+        retentionPolicy: {
+          enabled: false
+          days: 0
+        }
+      }
+    ]
   }
 }
-
-output monitorId string = monitor.id

@@ -1,66 +1,62 @@
-param vm1Name string
-param vm2Name string
-param vnet1Id string
-param vnet2Id string
-param location string
+param vmName string
+param location string = resourceGroup().location
+param subnetId string
 param adminUsername string
-@secure() param adminPassword securestring
+@secure()
+param adminPassword string
 
-resource vm1 'Microsoft.Compute/virtualMachines@2021-03-01' = {
-  name: vm1Name
+resource nic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
+  name: '${vmName}-nic'
+  location: location
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          subnet: {
+            id: subnetId
+          }
+          privateIPAllocationMethod: 'Dynamic'
+        }
+      }
+    ]
+  }
+}
+
+resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
+  name: vmName
   location: location
   properties: {
     hardwareProfile: {
-      vmSize: 'Standard_DS1_v2'
-    }
-    storageProfile: {
-      osDisk: {
-        createOption: 'FromImage'
-        name: '${vm1Name}-osDisk'
-      }
+      vmSize: 'Standard_B1s'  // Example VM size
     }
     osProfile: {
-      computerName: vm1Name
+      computerName: vmName
       adminUsername: adminUsername
       adminPassword: adminPassword
+      windowsConfiguration: {
+        enableAutomaticUpdates: true
+      }
+    }
+    storageProfile: {
+      imageReference: {
+        publisher: 'MicrosoftWindowsServer'
+        offer: 'WindowsServer'
+        sku: '2019-Datacenter'
+        version: 'latest'
+      }
+      osDisk: {
+        createOption: 'FromImage'
+      }
     }
     networkProfile: {
       networkInterfaces: [
         {
-          id: '${vnet1Id}/networkInterfaces/${vm1Name}-nic'
+          id: nic.id
         }
       ]
     }
   }
 }
 
-resource vm2 'Microsoft.Compute/virtualMachines@2021-03-01' = {
-  name: vm2Name
-  location: location
-  properties: {
-    hardwareProfile: {
-      vmSize: 'Standard_DS1_v2'
-    }
-    storageProfile: {
-      osDisk: {
-        createOption: 'FromImage'
-        name: '${vm2Name}-osDisk'
-      }
-    }
-    osProfile: {
-      computerName: vm2Name
-      adminUsername: adminUsername
-      adminPassword: adminPassword
-    }
-    networkProfile: {
-      networkInterfaces: [
-        {
-          id: '${vnet2Id}/networkInterfaces/${vm2Name}-nic'
-        }
-      ]
-    }
-  }
-}
-
-output vm1Id string = vm1.id
-output vm2Id string = vm2.id
+output vmId string = vm.id

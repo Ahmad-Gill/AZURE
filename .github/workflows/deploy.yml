@@ -1,21 +1,21 @@
-name: Azure Bicep Deployment
+name: Deploy Bicep Template to Azure
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on push to main branch
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Install Azure CLI
-      run: |
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
     - name: Login to Azure
       uses: azure/login@v1
@@ -23,16 +23,12 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Deploy Bicep Template
-      run: |
-        az deployment group create \
-          --resource-group myResourceGroup \
-          --template-file main.bicep \
-          --parameters location="EastUS" \
-                       vnet1Name="vnet1" \
-                       vnet2Name="vnet2" \
-                       vm1Name="vm1" \
-                       vm2Name="vm2" \
-                       storageAccount1Name="storage1" \
-                       storageAccount2Name="storage2" \
-                       adminUsername="azureadmin" \
-                       adminPassword="${{ secrets.ADMIN_PASSWORD }}"
+      uses: azure/arm-deploy@v1
+      with:
+        scope: resourcegroup
+        subscriptionId: ${{ fromJson(secrets.AZURE_CREDENTIALS).subscriptionId }}
+        resourceGroupName: 'myResourceGroup'  # Replace with your resource group name
+        region: eastus
+        template: ./main.bicep
+        parameters: |
+          adminPassword=${{ secrets.ADMIN_PASSWORD }}
