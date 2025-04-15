@@ -3,13 +3,13 @@
 // Define resource group to deploy to
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'myResourceGroup'
-  location: 'East US'
+  location: 'East US' // Directly specify the location here
 }
 
 // Define virtual network 1
 resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: 'vnet1'
-  location: rg.location
+  location: rg.location // Assign location directly from the resource group
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -22,7 +22,7 @@ resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' = {
 // Define virtual network 2
 resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: 'vnet2'
-  location: rg.location
+  location: rg.location // Assign location directly from the resource group
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -35,7 +35,6 @@ resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' = {
 // Import peering module for creating peering between VNet 1 and VNet 2
 module peering1 '../modules/peering.bicep' = {
   name: 'vnet1ToVnet2Peering'
-  scope: resourceGroup()  
   params: {
     vnet1Name: vnet1.name
     vnet1ResourceGroup: rg.name
@@ -47,7 +46,6 @@ module peering1 '../modules/peering.bicep' = {
 // Import peering module for creating peering between VNet 2 and VNet 1
 module peering2 '../modules/peering.bicep' = {
   name: 'vnet2ToVnet1Peering'
-  scope: resourceGroup()
   params: {
     vnet1Name: vnet2.name
     vnet1ResourceGroup: rg.name
