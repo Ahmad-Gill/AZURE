@@ -3,39 +3,57 @@ param adminUsername string
 @secure()
 param adminPassword string
 
+// Deploy VNet 1
 module vnet1 '../modules/vnet.bicep' = {
-  name: 'vnet1Module'
+  name: 'vnet1Deploy'
   params: {
     vnetName: 'vnet1'
-    location: location
-    addressPrefixes: ['10.0.0.0/16']
-    subnetPrefix: '10.0.0.0/24'
-  }
-}
-
-module vnet2 '../modules/vnet.bicep' = {
-  name: 'vnet2Module'
-  params: {
-    vnetName: 'vnet2'
     location: location
     addressPrefixes: ['10.1.0.0/16']
     subnetPrefix: '10.1.0.0/24'
   }
 }
 
-
-module peering '../modules/peering.bicep' = {
-  name: 'vnetPeeringBothWays'
+// Deploy VNet 2
+module vnet2 '../modules/vnet.bicep' = {
+  name: 'vnet2Deploy'
   params: {
-    vnet1Name: 'vnet1'
-    vnet2Name: 'vnet2'
-    vnet1Id: vnet1.outputs.vnetId
-    vnet2Id: vnet2.outputs.vnetId
+    vnetName: 'vnet2'
+    location: location
+    addressPrefixes: ['10.2.0.0/16']
+    subnetPrefix: '10.2.0.0/24'
   }
 }
 
+// VNet Peering: vnet1 → vnet2
+module peerVnet1toVnet2 '../modules/peering.bicep' = {
+  name: 'peerVnet1toVnet2'
+  params: {
+    parentVnetName: 'vnet1'
+    remoteVnetId: vnet2.outputs.vnetId
+    peeringName: 'vnet1-to-vnet2'
+  }
+  dependsOn: [
+    vnet1
+    vnet2
+  ]
+}
 
-// Deploying Virtual Machine 1 in VNet 1
+// VNet Peering: vnet2 → vnet1
+module peerVnet2toVnet1 '../modules/peering.bicep' = {
+  name: 'peerVnet2toVnet1'
+  params: {
+    parentVnetName: 'vnet2'
+    remoteVnetId: vnet1.outputs.vnetId
+    peeringName: 'vnet2-to-vnet1'
+  }
+  dependsOn: [
+    vnet1
+    vnet2
+  ]
+}
+
+// Deploy VM in VNet 1
 module vm1 '../modules/vm.bicep' = {
   name: 'vm1Deploy'
   params: {
@@ -45,9 +63,12 @@ module vm1 '../modules/vm.bicep' = {
     adminUsername: adminUsername
     adminPassword: adminPassword
   }
+  dependsOn: [
+    vnet1
+  ]
 }
 
-// Deploying Virtual Machine 2 in VNet 2
+// Deploy VM in VNet 2
 module vm2 '../modules/vm.bicep' = {
   name: 'vm2Deploy'
   params: {
@@ -57,9 +78,12 @@ module vm2 '../modules/vm.bicep' = {
     adminUsername: adminUsername
     adminPassword: adminPassword
   }
+  dependsOn: [
+    vnet2
+  ]
 }
 
-// Deploying Storage Account 1
+// Storage Account 1
 module storage1 '../modules/storage.bicep' = {
   name: 'storage1Deploy'
   params: {
@@ -68,7 +92,7 @@ module storage1 '../modules/storage.bicep' = {
   }
 }
 
-// Deploying Storage Account 2
+// Storage Account 2
 module storage2 '../modules/storage.bicep' = {
   name: 'storage2Deploy'
   params: {

@@ -1,16 +1,18 @@
-param vnet1Name string
-param vnet2Name string
 param vnet1Id string
 param vnet2Id string
 
+// Use the resourceId to declare existing VNets based on full ID
 resource vnet1 'Microsoft.Network/virtualNetworks@2021-03-01' existing = {
-  name: vnet1Name
+  scope: resourceGroup()
+  name: last(split(vnet1Id, '/'))
 }
 
 resource vnet2 'Microsoft.Network/virtualNetworks@2021-03-01' existing = {
-  name: vnet2Name
+  scope: resourceGroup()
+  name: last(split(vnet2Id, '/'))
 }
 
+// VNet1 → VNet2 Peering
 resource peering1 'Microsoft.Network/virtualNetworks/peerings@2021-08-01' = {
   name: 'peering-vnet1-to-vnet2'
   parent: vnet1
@@ -25,6 +27,7 @@ resource peering1 'Microsoft.Network/virtualNetworks/peerings@2021-08-01' = {
   }
 }
 
+// VNet2 → VNet1 Peering
 resource peering2 'Microsoft.Network/virtualNetworks/peerings@2021-08-01' = {
   name: 'peering-vnet2-to-vnet1'
   parent: vnet2
