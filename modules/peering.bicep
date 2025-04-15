@@ -1,15 +1,23 @@
+// modules/peering.bicep
+// This module creates a virtual network peering for an existing virtual network.
+
+// Input parameters: the parent VNet’s name, the remote VNet's resource ID,
+// and the name to use for the peering.
 param parentVnetName string
 param remoteVnetId string
 param peeringName string
 
-// Declare the parent virtual network as an existing resource.
+// (Optional) Declare the parent virtual network as an existing resource.
+// This declaration is optional if you don't need to reference properties of the parent.
 resource parentVnet 'Microsoft.Network/virtualNetworks@2021-03-01' existing = {
   name: parentVnetName
 }
 
-// Create the virtual network peering with the proper name format.
+// Create the virtual network peering. When you use the 'parent' property,
+// the resource name should be just the child name without any slashes.
 resource vnetPeering 'Microsoft.Network/virtualNetworks/peerings@2021-05-01' = {
-  name: peeringName  // Use the peeringName parameter directly here
+  name: peeringName
+  parent: parentVnet
   properties: {
     remoteVirtualNetwork: {
       id: remoteVnetId
