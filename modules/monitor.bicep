@@ -1,4 +1,5 @@
 param location string
+param storageAccount1Id string  // Add this parameter to receive the storage account ID
 
 resource monitor 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
   name: 'monitorSetting'
@@ -7,7 +8,7 @@ resource monitor 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
     logs: []
     metrics: []
     storageAccount: {
-      id: storageAccount1Id
+      id: storageAccount1Id  // Use the passed storage account ID
     }
     eventHub: {
       eventHubAuthorizationRuleId: ''
@@ -15,4 +16,4 @@ resource monitor 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
   }
 }
 
-output monitorId string = monitor.id
+output monitorId string = monitor.id  // Output the monitor ID
